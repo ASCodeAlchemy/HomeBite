@@ -14,7 +14,7 @@ public class JwtUtil {
         this.key = Base64.getDecoder().decode(secret);
     }
 
-    // Extract the email (Subject) from the token
+
     public String extractEmail(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
