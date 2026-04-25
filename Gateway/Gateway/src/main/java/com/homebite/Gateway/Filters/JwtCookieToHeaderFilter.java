@@ -13,9 +13,10 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
-    public class JwtCookieToHeaderFilter extends AbstractGatewayFilterFactory<JwtCookieToHeaderFilter.Config> {
+public class JwtCookieToHeaderFilter extends AbstractGatewayFilterFactory<JwtCookieToHeaderFilter.Config> {
+
     @Autowired
-     private JwtUtil jwtUtil;
+    private  JwtUtil jwtUtil;
 
     public JwtCookieToHeaderFilter() {
         super(Config.class);
