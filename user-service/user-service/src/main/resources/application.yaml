@@ -1,3 +1,70 @@
 spring:
   application:
     name: user-service
+
+  kafka:
+
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: user-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+
+
+
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/homebiteUsers
+    username: postgres
+    password: root204
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: homebiteind@gmail.com
+    password: kmzq uxrq awlm jxyo
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.ssl.trust: smtp.gmail.com
+
+
+
+
+  security:
+    EXPIRATION: 3600000
+    SECRET_KEY: AJxtzZlpcUoB0uP93dq94sDArkKguErVbJpOLrmE2rsGxtEiDcgXhKJl8y3JXhAz3++fVfogxU8fEWs2feqiIA==
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 6000
+
+server:
+  port: 8081
+
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+

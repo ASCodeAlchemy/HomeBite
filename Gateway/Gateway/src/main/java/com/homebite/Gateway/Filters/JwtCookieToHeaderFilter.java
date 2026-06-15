@@ -32,8 +32,7 @@ import reactor.core.publisher.Mono;
             if (path.startsWith("/api/users/auth") ||
                     path.equals("/api/users/register") ||
                     path.equals("/api/users/verify-otp") ||
-                    path.equals("/api/users/verify-register-otp") ||
-                    path.equals("/api/users/oauth/login")) {
+                    path.equals("/api/users/verify-register-otp")) {
                 return chain.filter(exchange);
             }
 

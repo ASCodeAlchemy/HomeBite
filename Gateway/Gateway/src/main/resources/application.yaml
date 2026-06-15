@@ -1,3 +1,32 @@
 spring:
   application:
     name: Gateway
+
+
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: http://localhost:8081
+          predicates:
+            -Path=/api/users/**
+          filters:
+            -JwtCookieToHeaderFilter
+            - StripPrefix=2
+
+
+jwt:
+  secret: cCd8F0jjX/cYQvSUWvVO8ipDrO/4fd1iEgNTCwWDjMxneZcK1OwRj/Mgn3gDyBoPo7YZS+hyUBi6Scd2LrKJLw==
+
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+
+
+
+server:
+  port: 8080
+
+
