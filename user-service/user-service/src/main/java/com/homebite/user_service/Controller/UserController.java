@@ -11,10 +11,13 @@ import com.homebite.user_service.Service.EmailService;
 import com.homebite.user_service.Service.OTPService;
 import com.homebite.user_service.Service.PendingUserService;
 import com.homebite.user_service.Service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -87,6 +90,44 @@ public class UserController {
         kafkaTemplate.send("auth-events", email, welcomeEvent);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseDTO("User registered successfully"));
+    }
+
+
+    @PostMapping("/auth/login")
+public ResponseEntity<ResponseDTO> login(@RequestBody UserDTO userDTO) throws Exception{
+    if(!userService.emailExists(userDTO.getEmail())){
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO("Email Not Registred"));
+
+    }
+
+String otp = otpService.generateOtp(userDTO.getEmail());
+emailService.sendVerificationEmail(userDTO.getEmail(),otp,"LOGIN_OTP");
+return ResponseEntity.ok(new ResponseDTO("OTP Send to Email"));
+
+}
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ResponseDTO> verifyOtp(@RequestBody OtpDTO otpDTO, HttpServletResponse response) {
+        String otp = otpDTO.getOtp();
+
+
+        String email = otpService.verifyOtpAndGetEmail(otp);
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO("Invalid or expired OTP"));
+        }
+
+
+        UserDetails userDetails = myUserDetailService.loadUserByUsername(email);
+        String jwt = jwtService.generateToken(userDetails);
+
+        Cookie cookie = new Cookie("jwt", jwt);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 60 * 24);
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok(new ResponseDTO("Login successful"));
     }
 
 

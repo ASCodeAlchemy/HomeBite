@@ -40,6 +40,14 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(gatewayHeaderAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout->logout.logoutUrl("/logout")
+                        .deleteCookies("jwt")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"message\":\"Logged out successfully\"}");
+
+                        }))
                 .build();
     }
 

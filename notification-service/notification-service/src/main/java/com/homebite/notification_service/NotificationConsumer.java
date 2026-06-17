@@ -37,7 +37,6 @@ private static final String GROUP_ID= "notification-v1";
 
         String type = String.valueOf(event.get("type"));
         String email = String.valueOf(event.get("email"));
-        String username = String.valueOf(event.get("username"));
         String otp = String.valueOf(event.get("otp"));
 
         if ("REGISTER_OTP".equals(type)) {
@@ -48,6 +47,9 @@ private static final String GROUP_ID= "notification-v1";
             emailService.sendHtmlEmail(email,"Welcome Onboard of HomeBite", templateEngine.getWelcomeTemplate(email));
         }
 
+        if("LOGIN_OTP".equals(type)){
+            emailService.sendHtmlEmail(email,"Login One-Time Password", templateEngine.getLoginOtpTemplate(email,otp));
+        }
 
 
     }
