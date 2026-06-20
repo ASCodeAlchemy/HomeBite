@@ -6,7 +6,6 @@ import com.homebite.user_service.Config.MyUserDetailService;
 import com.homebite.user_service.DTOs.RequestDTO.OtpDTO;
 import com.homebite.user_service.DTOs.RequestDTO.UserDTO;
 import com.homebite.user_service.DTOs.ResponseDTO.ResponseDTO;
-import com.homebite.user_service.Repositories.UserRepo;
 import com.homebite.user_service.Service.EmailService;
 import com.homebite.user_service.Service.OTPService;
 import com.homebite.user_service.Service.PendingUserService;
@@ -34,11 +33,11 @@ public class UserController {
     private final EmailService emailService;
     private final PendingUserService pendingUserService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final UserRepo userRepo;
+
 
 
     @Autowired
-    public UserController(UserService userService, JWTService jwtService, MyUserDetailService myUserDetailService, OTPService otpService, EmailService emailService, PendingUserService pendingUserService, KafkaTemplate<String, Object> kafkaTemplate, UserRepo userRepo) {
+    public UserController(UserService userService, JWTService jwtService, MyUserDetailService myUserDetailService, OTPService otpService, EmailService emailService, PendingUserService pendingUserService, KafkaTemplate<String, Object> kafkaTemplate) {
         this.userService = userService;
         this.jwtService = jwtService;
         this.myUserDetailService = myUserDetailService;
@@ -46,7 +45,7 @@ public class UserController {
         this.emailService = emailService;
         this.pendingUserService = pendingUserService;
         this.kafkaTemplate = kafkaTemplate;
-        this.userRepo = userRepo;
+
     }
 
     @PostMapping("/register")
@@ -94,9 +93,9 @@ public class UserController {
 
 
     @PostMapping("/auth/login")
-public ResponseEntity<ResponseDTO> login(@RequestBody UserDTO userDTO) throws Exception{
+public ResponseEntity<ResponseDTO> login(@RequestBody UserDTO userDTO) {
     if(!userService.emailExists(userDTO.getEmail())){
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO("Email Not Registred"));
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO("Email Not Registered"));
 
     }
 

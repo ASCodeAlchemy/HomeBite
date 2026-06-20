@@ -37,10 +37,7 @@ public class UserService {
        user.setAddress(userDTO.getAddress());
        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
-
-
         return user;
-
     }
 
     public ResponseDTO signUp(UserDTO userDTO) {
