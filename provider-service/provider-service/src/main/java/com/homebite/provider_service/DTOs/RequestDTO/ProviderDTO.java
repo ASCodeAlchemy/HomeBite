@@ -12,10 +12,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ProviderDTO {
 
-    private String rest_name;
-    private String username;
+    private String restName;
     private String fullName;
     private String email;
     private String password;
-    private String rest_address;
+    private String restAddress;
 }

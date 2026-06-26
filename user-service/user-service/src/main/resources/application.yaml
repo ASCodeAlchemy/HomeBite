@@ -50,8 +50,7 @@ spring:
 
   security:
     EXPIRATION: 3600000
-    SECRET_KEY: AJxtzZlpcUoB0uP93dq94sDArkKguErVbJpOLrmE2rsGxtEiDcgXhKJl8y3JXhAz3++fVfogxU8fEWs2feqiIA==
-
+    SECRET_KEY: jdWWfrI4snlyFi2AfNY0tVgjJgZkDqdD+EV3YauOqzP4xRXWRjXvONNyA8AEFNoKh6p3VsxBA1mGqDm2d/punQ==
   data:
     redis:
       host: localhost

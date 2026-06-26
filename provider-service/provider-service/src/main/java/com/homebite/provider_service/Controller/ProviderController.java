@@ -6,27 +6,22 @@ import com.homebite.provider_service.DTOs.RequestDTO.OtpDto;
 import com.homebite.provider_service.DTOs.RequestDTO.ProviderDTO;
 import com.homebite.provider_service.DTOs.ResponseDTO.ResponseDTO;
 import com.homebite.provider_service.Repositories.ProviderRepo;
-import com.homebite.provider_service.Services.EmailService;
-import com.homebite.provider_service.Services.OTPService;
-import com.homebite.provider_service.Services.PendingUserService;
-import com.homebite.provider_service.Services.ProviderService;
-import com.netflix.discovery.converters.Auto;
+import com.homebite.provider_service.Services.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+
 public class ProviderController {
 
     private final ProviderService providerService;
@@ -39,6 +34,8 @@ public class ProviderController {
     private final ProviderRepo providerRepo;
 
 
+
+
     @Autowired
     public ProviderController(ProviderService providerService, JWTService jwtService, MyUserDetailService myUserDetailService, OTPService otpService, EmailService emailService, PendingUserService pendingUserService, KafkaTemplate<String, Object> kafkaTemplate, ProviderRepo providerRepo) {
         this.providerService = providerService;
@@ -49,6 +46,7 @@ public class ProviderController {
         this.pendingUserService = pendingUserService;
         this.kafkaTemplate = kafkaTemplate;
         this.providerRepo = providerRepo;
+
     }
 
 
@@ -140,6 +138,22 @@ public class ProviderController {
 
         return ResponseEntity.ok(new ResponseDTO("Login successful"));
     }
+
+
+    @GetMapping("/test")
+    public String testRoute(@AuthenticationPrincipal UserDetails userDetails){
+
+        if(userDetails==null){
+             return "Unauthorized";
+        }
+        return "This is Secured Route";
+    }
+
+
+
+
+
+
     }
 
 

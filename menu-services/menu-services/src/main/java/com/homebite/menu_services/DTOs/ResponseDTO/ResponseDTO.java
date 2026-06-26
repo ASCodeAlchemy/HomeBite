@@ -1,4 +1,4 @@
-package com.homebite.user_service.DTOs.RequestDTO;
+package com.homebite.menu_services.DTOs.ResponseDTO;
 
 
 import lombok.AllArgsConstructor;
@@ -10,13 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+public class ResponseDTO {
 
-    String fullName;
-    String email;
-    String password;
-    String Address;
-
-
-
+    private String message;
 }

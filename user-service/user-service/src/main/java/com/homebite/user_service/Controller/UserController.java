@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -127,6 +129,16 @@ return ResponseEntity.ok(new ResponseDTO("OTP Send to Email"));
         response.addCookie(cookie);
 
         return ResponseEntity.ok(new ResponseDTO("Login successful"));
+    }
+
+
+    @GetMapping("/test")
+    public String testRoute(@AuthenticationPrincipal UserDetails userDetails){
+        if(userDetails==null){
+            return "Check Ur Route it is Unauthorized";
+        }
+
+        return "Successful";
     }
 
 

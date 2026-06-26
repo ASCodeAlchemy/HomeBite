@@ -1,4 +1,4 @@
-package com.homebite.provider_service.Config;
+package com.homebite.menu_services.Config;
 
 import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Value;
