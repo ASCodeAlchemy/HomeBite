@@ -1,16 +1,15 @@
-package com.homebite.menu_services.DTOs.RequestDTO;
+package com.homebite.user_service.DTOs.RequestDTO;
 
 
+import jdk.jfr.StackTrace;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
+@StackTrace
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class DishDTO {
 
     private String dishName;

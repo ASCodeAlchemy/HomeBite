@@ -1,4 +1,5 @@
-package com.homebite.menu_services.Config;
+package com.homebite.user_service.Config;
+
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -19,16 +20,12 @@ public class FeignClientConfig {
                 ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
                 if (attributes != null) {
                     HttpServletRequest request = attributes.getRequest();
-
-
                     String authHeader = request.getHeader("Authorization");
                     String emailHeader = request.getHeader("X-User-Email");
-
 
                     if (authHeader != null) {
                         template.header("Authorization", authHeader);
                     }
-
 
                     if (emailHeader != null) {
                         template.header("X-User-Email", emailHeader);

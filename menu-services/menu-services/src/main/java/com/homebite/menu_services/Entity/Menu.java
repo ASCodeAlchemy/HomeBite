@@ -29,4 +29,5 @@ public class Menu {
     @JoinColumn(name = "menu_id")
     private List<Dishes> dishes = new ArrayList<>();
 
+
 }

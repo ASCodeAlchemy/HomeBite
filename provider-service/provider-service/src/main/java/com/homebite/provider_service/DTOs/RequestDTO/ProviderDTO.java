@@ -12,6 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ProviderDTO {
 
+    private Long providerId;
+
     private String restName;
     private String fullName;
     private String email;

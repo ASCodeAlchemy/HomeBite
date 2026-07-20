@@ -1,13 +1,11 @@
-package com.homebite.menu_services.DTOs.RequestDTO;
+package com.homebite.user_service.DTOs.RequestDTO;
 
 
-import com.homebite.menu_services.Entity.Dishes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -17,6 +15,5 @@ import java.util.List;
 public class MenuDTO {
 
     private Long providerId;
-
-    private List<DishDTO> dishes = new ArrayList<>();
+    private List<DishDTO> dishes;
 }

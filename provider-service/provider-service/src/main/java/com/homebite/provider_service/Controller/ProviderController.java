@@ -5,9 +5,11 @@ import com.homebite.provider_service.Config.MyUserDetailService;
 import com.homebite.provider_service.DTOs.RequestDTO.OtpDto;
 import com.homebite.provider_service.DTOs.RequestDTO.ProviderDTO;
 import com.homebite.provider_service.DTOs.ResponseDTO.ResponseDTO;
+import com.homebite.provider_service.Entity.Provider;
 import com.homebite.provider_service.Repositories.ProviderRepo;
 import com.homebite.provider_service.Services.*;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,9 +21,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
-
+@RequestMapping("")
 public class ProviderController {
 
     private final ProviderService providerService;
@@ -140,17 +143,47 @@ public class ProviderController {
     }
 
 
-    @GetMapping("/test")
-    public String testRoute(@AuthenticationPrincipal UserDetails userDetails){
 
-        if(userDetails==null){
-             return "Unauthorized";
+    @GetMapping("/me")
+    public ResponseEntity<?> getLoggedInProviderId(HttpServletRequest request) {
+        try {
+            String email = request.getHeader("X-User-Email");
+            if (email == null || email.trim().isEmpty()) {
+                return ResponseEntity.status(401).body("Missing email header");
+            }
+
+            Optional<Provider> providerOpt = providerRepo.findByEmail(email);
+
+            if (providerOpt.isEmpty()) {
+                return ResponseEntity.status(403).body("User is logged in but not registered as a Provider");
+            }
+
+            return ResponseEntity.ok(providerOpt.get().getProviderId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("ERROR in /me endpoint: " + e.getMessage());
+            return ResponseEntity.status(500).body("Error retrieving provider: " + e.getMessage());
         }
-        return "This is Secured Route";
     }
 
+    @GetMapping("/{id}/internal-info")
+    public ResponseEntity<?> getProviderInternalInfo(@PathVariable long id) {
+        Optional<Provider> providerOpt = providerRepo.findById(id);
 
+        if (providerOpt.isEmpty()) {
+            return ResponseEntity.status(404).body("Provider not found");
+        }
 
+        Provider provider = providerOpt.get();
+        Map<String, Object> providerInfo = new HashMap<>();
+        providerInfo.put("providerId", provider.getProviderId());
+        providerInfo.put("restName", provider.getRestName());
+        providerInfo.put("fullName", provider.getFullName());
+        providerInfo.put("email", provider.getEmail());
+        providerInfo.put("restAddress", provider.getRestAddress());
+
+        return ResponseEntity.ok(providerInfo);
+    }
 
 
 

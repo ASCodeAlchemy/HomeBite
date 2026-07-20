@@ -3,9 +3,11 @@ package com.homebite.user_service.Controller;
 
 import com.homebite.user_service.Config.JWTService;
 import com.homebite.user_service.Config.MyUserDetailService;
+import com.homebite.user_service.DTOs.RequestDTO.MenuDTO;
 import com.homebite.user_service.DTOs.RequestDTO.OtpDTO;
 import com.homebite.user_service.DTOs.RequestDTO.UserDTO;
 import com.homebite.user_service.DTOs.ResponseDTO.ResponseDTO;
+import com.homebite.user_service.Repositories.MenuClient;
 import com.homebite.user_service.Service.EmailService;
 import com.homebite.user_service.Service.OTPService;
 import com.homebite.user_service.Service.PendingUserService;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -35,11 +38,12 @@ public class UserController {
     private final EmailService emailService;
     private final PendingUserService pendingUserService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final MenuClient menuClient;
 
 
 
     @Autowired
-    public UserController(UserService userService, JWTService jwtService, MyUserDetailService myUserDetailService, OTPService otpService, EmailService emailService, PendingUserService pendingUserService, KafkaTemplate<String, Object> kafkaTemplate) {
+    public UserController(UserService userService, JWTService jwtService, MyUserDetailService myUserDetailService, OTPService otpService, EmailService emailService, PendingUserService pendingUserService, KafkaTemplate<String, Object> kafkaTemplate,MenuClient menuClient) {
         this.userService = userService;
         this.jwtService = jwtService;
         this.myUserDetailService = myUserDetailService;
@@ -47,7 +51,7 @@ public class UserController {
         this.emailService = emailService;
         this.pendingUserService = pendingUserService;
         this.kafkaTemplate = kafkaTemplate;
-
+        this.menuClient = menuClient;
     }
 
     @PostMapping("/register")
@@ -131,15 +135,11 @@ return ResponseEntity.ok(new ResponseDTO("OTP Send to Email"));
         return ResponseEntity.ok(new ResponseDTO("Login successful"));
     }
 
-
-    @GetMapping("/test")
-    public String testRoute(@AuthenticationPrincipal UserDetails userDetails){
-        if(userDetails==null){
-            return "Check Ur Route it is Unauthorized";
-        }
-
-        return "Successful";
+    @GetMapping("/browse-menus")
+    public ResponseEntity<List<MenuDTO>> getDashboardMenus() {
+        return ResponseEntity.ok(userService.getDashboardMenus());
     }
+
 
 
 

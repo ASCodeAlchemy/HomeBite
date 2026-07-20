@@ -1,14 +1,17 @@
 package com.homebite.user_service.Service;
 
 
+import com.homebite.user_service.DTOs.RequestDTO.MenuDTO;
 import com.homebite.user_service.DTOs.RequestDTO.UserDTO;
 import com.homebite.user_service.DTOs.ResponseDTO.ResponseDTO;
 import com.homebite.user_service.Entitiy.Users;
+import com.homebite.user_service.Repositories.MenuClient;
 import com.homebite.user_service.Repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,12 +19,14 @@ public class UserService {
 
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
+    private final MenuClient menuClient;
 
 
     @Autowired
-    public UserService(UserRepo userRepo, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepo userRepo, PasswordEncoder passwordEncoder, MenuClient menuClient) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
+        this.menuClient = menuClient;
     }
 
     public Users register(UserDTO userDTO){
@@ -55,6 +60,11 @@ public class UserService {
 
     public boolean emailExists(String email) {
         return userRepo.findByEmail(email).isPresent();
+    }
+
+
+    public List<MenuDTO> getDashboardMenus() {
+        return menuClient.getDashboardMenus();
     }
 
 

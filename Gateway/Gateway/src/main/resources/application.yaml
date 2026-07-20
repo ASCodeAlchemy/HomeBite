@@ -20,7 +20,7 @@ spring:
             - Path=/api/providers/menu/**
           filters:
             - JwtCookieToHeaderFilter
-            - StripPrefix=2
+            - StripPrefix=3
 
               
 

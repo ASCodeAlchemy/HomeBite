@@ -43,18 +43,18 @@ public class MenuServices {
     private String bucketName;
 
 
-    public Menu addDishToMenu(Long providerId, DishDTO dishDTO, MultipartFile image) throws Exception {
-
+    public Menu addDishToMenu(Long providerId, DishDTO dishDTO, MultipartFile image, String token, String email) throws Exception {
 
         Menu menu = menuRepository.findByProviderId(providerId).orElseGet(() -> {
-
-            Map<String, Object> providerInfo = providerClient.getProviderInternalInfo(providerId);
-            if (providerInfo == null || !(Boolean) providerInfo.get("isActive")) {
-                throw new RuntimeException("Invalid or Inactive Provider");
+            Map<String, Object> providerInfo = providerClient.getProviderInternalInfo(providerId,token,email);
+            if (providerInfo == null) {
+                throw new RuntimeException("Provider info could not be retrieved from internal client");
             }
+
             Menu newMenu = new Menu();
             newMenu.setProviderId(providerId);
-            newMenu.setRestaurantName((String) providerInfo.get("restaurantName"));
+
+            newMenu.setRestaurantName((String) providerInfo.get("restName"));
             return newMenu;
         });
 
@@ -76,6 +76,8 @@ public class MenuServices {
         dish.setVeg(dishDTO.getVeg());
         dish.setImageFileName(fileName);
 
+
+
         menu.getDishes().add(dish);
 
         return menuRepository.save(menu);
@@ -85,10 +87,9 @@ public class MenuServices {
     public List<Menu> getDashboardMenus() {
         List<Menu> menus = menuRepository.findAll();
 
-        // Loop through everything to attach temporary MinIO URLs dynamically before sending to UI
         for (Menu menu : menus) {
             for (Dishes dish : menu.getDishes()) {
-                dish.setImageFileName(getPresignedUrl(dish.getImageFileName()));
+                dish.setImageUrl(getPresignedUrl(dish.getImageFileName()));
             }
         }
         return menus;

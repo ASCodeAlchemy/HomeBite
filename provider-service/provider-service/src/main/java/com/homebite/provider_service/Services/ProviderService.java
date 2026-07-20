@@ -44,6 +44,7 @@ public class ProviderService {
         Provider provider = new Provider();
 
         provider.setEmail(providerDTO.getEmail());
+        provider.setFullName(providerDTO.getFullName());
         provider.setPassword(passwordEncoder.encode(providerDTO.getPassword()));
         provider.setRestName(providerDTO.getRestName());
         provider.setRestAddress(providerDTO.getRestAddress());

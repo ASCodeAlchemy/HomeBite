@@ -1,6 +1,5 @@
 package com.homebite.menu_services.Entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +22,9 @@ public class Dishes {
     private Double price;
     private Boolean veg;
     private String imageFileName;
+
+    @Transient
+    private String imageUrl;
 
 
 }

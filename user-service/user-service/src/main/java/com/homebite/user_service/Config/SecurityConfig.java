@@ -36,7 +36,7 @@ public class SecurityConfig {
         return http
                 .cors(cors->{})
                 .csrf(customizer->customizer.disable())
-                .authorizeHttpRequests(request->request.requestMatchers("/register","/auth/login","/verify-otp","/verify-register-otp").permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(request->request.requestMatchers("/register","/auth/login","/verify-otp","/verify-register-otp","/menus/dashboard").permitAll().anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(form->form.disable())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

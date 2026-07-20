@@ -35,9 +35,11 @@ public class SecurityConfig {
         return http
                 .cors(cors->{})
                 .csrf(customizer->customizer.disable())
-                .authorizeHttpRequests(request->request.requestMatchers("/register","/auth/login","/verify-register-otp","/verify-otp").permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(request->request.requestMatchers("/register","/auth/login","/verify-register-otp","/verify-otp").permitAll()
+                        .requestMatchers("/me","/**/internal-info").permitAll()
+                        .anyRequest().authenticated())
                 .formLogin(form->form.disable())
-                .httpBasic(Customizer.withDefaults())
+                .httpBasic(httpBasic->httpBasic.disable())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(gatewayHeaderAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout->logout.logoutUrl("/logout")
