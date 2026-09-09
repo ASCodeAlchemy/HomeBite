@@ -12,11 +12,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name= "dishes")
-public class Dishes {
+public class Tiffin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long dishId;
+    private Long tiffinId;
 
     private String dishName;
     private Double price;

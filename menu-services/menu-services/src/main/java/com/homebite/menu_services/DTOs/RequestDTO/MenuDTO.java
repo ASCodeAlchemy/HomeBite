@@ -1,7 +1,6 @@
 package com.homebite.menu_services.DTOs.RequestDTO;
 
 
-import com.homebite.menu_services.Entity.Dishes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,5 +17,5 @@ public class MenuDTO {
 
     private Long providerId;
 
-    private List<DishDTO> dishes = new ArrayList<>();
+    private List<TiffinDTO> dishes = new ArrayList<>();
 }

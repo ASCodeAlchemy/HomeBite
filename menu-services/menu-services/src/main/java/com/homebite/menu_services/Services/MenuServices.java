@@ -2,21 +2,21 @@ package com.homebite.menu_services.Services;
 
 
 import com.homebite.menu_services.Client.ProviderClient;
-import com.homebite.menu_services.DTOs.RequestDTO.DishDTO;
-import com.homebite.menu_services.DTOs.RequestDTO.MenuDTO;
-import com.homebite.menu_services.Entity.Dishes;
+import com.homebite.menu_services.DTOs.RequestDTO.TiffinDTO;
+import com.homebite.menu_services.DTOs.ResponseDTO.TiffinDetailsDTO;
 import com.homebite.menu_services.Entity.Menu;
+import com.homebite.menu_services.Entity.Tiffin;
 import com.homebite.menu_services.Repositories.MenuRepo;
-import org.springframework.stereotype.Service;
-
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.http.Method;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -43,7 +43,7 @@ public class MenuServices {
     private String bucketName;
 
 
-    public Menu addDishToMenu(Long providerId, DishDTO dishDTO, MultipartFile image, String token, String email) throws Exception {
+    public Menu addDishToMenu(Long providerId, TiffinDTO dishDTO, MultipartFile image, String token, String email) throws Exception {
 
         Menu menu = menuRepository.findByProviderId(providerId).orElseGet(() -> {
             Map<String, Object> providerInfo = providerClient.getProviderInternalInfo(providerId,token,email);
@@ -70,7 +70,7 @@ public class MenuServices {
         );
 
 
-        Dishes dish = new Dishes();
+        Tiffin dish = new Tiffin();
         dish.setDishName(dishDTO.getDishName());
         dish.setPrice(dishDTO.getPrice());
         dish.setVeg(dishDTO.getVeg());
@@ -88,11 +88,28 @@ public class MenuServices {
         List<Menu> menus = menuRepository.findAll();
 
         for (Menu menu : menus) {
-            for (Dishes dish : menu.getDishes()) {
+            for (Tiffin dish : menu.getDishes()) {
                 dish.setImageUrl(getPresignedUrl(dish.getImageFileName()));
             }
         }
         return menus;
+    }
+
+    public TiffinDetailsDTO getTiffinDetails(Long tiffinId) {
+        Menu menu = menuRepository.findMenuContainingDish(tiffinId)
+                .orElseThrow(() -> new IllegalArgumentException("Tiffin not found"));
+        Tiffin tiffin = menu.getDishes().stream()
+                .filter(dish -> tiffinId.equals(dish.getTiffinId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Tiffin not found"));
+
+        return new TiffinDetailsDTO(
+                tiffin.getTiffinId(),
+                menu.getProviderId(),
+                tiffin.getDishName(),
+                BigDecimal.valueOf(tiffin.getPrice()),
+                tiffin.getVeg()
+        );
     }
 
     private String getPresignedUrl(String fileName) {

@@ -27,7 +27,7 @@ public class Menu {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "menu_id")
-    private List<Dishes> dishes = new ArrayList<>();
+    private List<Tiffin> dishes = new ArrayList<>();
 
 
 }

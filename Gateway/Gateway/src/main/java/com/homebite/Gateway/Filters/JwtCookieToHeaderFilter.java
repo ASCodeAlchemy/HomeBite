@@ -2,6 +2,7 @@ package com.homebite.Gateway.Filters;
 
 import com.homebite.Gateway.Utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpCookie;
@@ -16,6 +17,9 @@ import reactor.core.publisher.Mono;
     public class JwtCookieToHeaderFilter extends AbstractGatewayFilterFactory<JwtCookieToHeaderFilter.Config> {
     @Autowired
      private JwtUtil jwtUtil;
+
+    @Value("${gateway.internal-secret}")
+    private String gatewaySecret;
 
 
     public JwtCookieToHeaderFilter() {
@@ -36,7 +40,11 @@ import reactor.core.publisher.Mono;
                     path.equals("/api/providers/register") ||
                     path.equals("/api/providers/verify-register-otp")||
                     path.equals("/api/providers/auth/login")||
-                    path.equals("/api/providers/verify-otp")
+                    path.equals("/api/providers/verify-otp") ||
+                    path.equals("/api/drivers/register") ||
+                    path.equals("/api/drivers/verify-register-otp") ||
+                    path.equals("/api/drivers/auth/login") ||
+                    path.equals("/api/drivers/verify-otp")
             ) {
                 return chain.filter(exchange);
             }
@@ -56,6 +64,7 @@ import reactor.core.publisher.Mono;
                 ServerHttpRequest mutatedRequest = request.mutate()
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .header("X-User-Email", email)
+                        .header("X-Gateway-Secret", gatewaySecret)
                         .build();
 
                 return chain.filter(exchange.mutate().request(mutatedRequest).build());
