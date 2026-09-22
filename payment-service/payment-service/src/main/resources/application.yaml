@@ -26,8 +26,8 @@ server:
   port: 8082
 
 razorpay:
-  key-id: rzp_test_S4wJ9OE3aYueRA
-  key-secret: LUCcJeyVpNo4aZzPzI7E7DJm
+  key-id: *
+  key-secret: *
 
 eureka:
   client:
