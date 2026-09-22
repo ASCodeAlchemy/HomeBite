@@ -2,9 +2,11 @@ package com.homebite.provider_service.Services;
 
 
 import com.homebite.provider_service.Config.JWTService;
+import com.homebite.provider_service.DTOs.RequestDTO.OrderDTO;
 import com.homebite.provider_service.DTOs.RequestDTO.ProviderDTO;
 import com.homebite.provider_service.DTOs.ResponseDTO.ResponseDTO;
 import com.homebite.provider_service.Entity.Provider;
+import com.homebite.provider_service.Repositories.OrderClient;
 import com.homebite.provider_service.Repositories.ProviderRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +16,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,14 +26,16 @@ public class ProviderService {
    final private ProviderRepo providerRepo;
    final private PasswordEncoder passwordEncoder;
    final private JWTService jwtService;
+   final private OrderClient orderClient;
 
 
 
     @Autowired
-    public ProviderService(ProviderRepo providerRepo, PasswordEncoder passwordEncoder,JWTService jwtService){
+    public ProviderService(ProviderRepo providerRepo, PasswordEncoder passwordEncoder,JWTService jwtService,OrderClient orderClient){
         this.providerRepo=providerRepo;
         this.passwordEncoder= passwordEncoder;
         this.jwtService=jwtService;
+        this.orderClient=orderClient;
 
 
     }
@@ -112,6 +118,12 @@ public class ProviderService {
             System.out.println("PROVIDER-SERVICE DEBUG: JWT Parsing Failed -> " + e.getMessage());
             return ResponseEntity.status(401).body("Invalid Token Signature or Expired");
         }
+    }
+
+
+    public List<OrderDTO> getMyOrders() {
+
+        return orderClient.findOrderByProvider();
     }
 
 

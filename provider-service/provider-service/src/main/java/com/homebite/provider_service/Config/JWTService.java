@@ -1,12 +1,13 @@
 package com.homebite.provider_service.Config;
 
+import com.homebite.provider_service.Entity.Provider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -20,21 +21,27 @@ import java.util.function.Function;
 public class JWTService {
 
     @Value("${spring.security.SECRET_KEY}")
-    private String secretKey ;
+    private String secretKey;
 
     @Value("${spring.security.EXPIRATION}")
-    private int Expiration;
+    private int expiration;
 
     private SecretKey cachedKey;
 
     @PostConstruct
     public void init() {
+
         try {
-            System.out.println("JWT Secret Key (Base64): " + secretKey);
-            byte[] keybytes = Decoders.BASE64.decode(secretKey);
-            cachedKey = Keys.hmacShaKeyFor(keybytes);
+            byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+
+            cachedKey = Keys.hmacShaKeyFor(keyBytes);
+
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid SECRET_KEY: must be a Base64-encoded string. Current value: " + secretKey, e);
+
+            throw new IllegalArgumentException(
+                    "Invalid SECRET_KEY: must be a Base64-encoded string",
+                    e
+            );
         }
     }
 
@@ -43,66 +50,130 @@ public class JWTService {
     }
 
     public String generateToken(UserDetails userDetails) {
+
         Map<String, Object> claims = new HashMap<>();
+
         String subject = userDetails.getUsername();
-        if (userDetails instanceof com.homebite.provider_service.Entity.Provider provider) {
+
+        if (userDetails instanceof Provider provider) {
+
             subject = provider.getEmail();
+
+            System.out.println("========== JWT GENERATION ==========");
+            System.out.println("Provider email = " + provider.getEmail());
+            System.out.println("Provider ID    = " + provider.getProviderId());
+
+            claims.put("providerId", String.valueOf(provider.getProviderId()));
+
+
+            claims.put("role", "PROVIDER");
         }
+
+        System.out.println("Claims = " + claims);
+        System.out.println("====================================");
+
         return Jwts.builder()
                 .claims()
                 .add(claims)
                 .subject(subject)
                 .issuer("HomeBite")
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + Expiration))
+                .expiration(
+                        new Date(
+                                System.currentTimeMillis() + expiration
+                        )
+                )
                 .and()
                 .signWith(getKey())
                 .compact();
     }
 
-    public Claims extractALllClaims(String token){
+    public Claims extractAllClaims(String token) {
+
         try {
+
             return Jwts.parser()
                     .verifyWith(getKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
+
         } catch (SignatureException e) {
-            System.err.println("JWT signature does not match: " + e.getMessage());
+
+            System.err.println(
+                    "JWT signature does not match: "
+                            + e.getMessage()
+            );
+
             return null;
+
         } catch (Exception e) {
-            System.err.println("JWT extractALllClaims error: " + e.getMessage());
+
+            System.err.println(
+                    "JWT extraction error: "
+                            + e.getMessage()
+            );
+
             return null;
         }
     }
 
-    private <T> T extractClaims(String token, Function<Claims,T> claimResolver){
-        final Claims claims= extractALllClaims(token);
-        return claims != null ? claimResolver.apply(claims) : null;
+    private <T> T extractClaim(
+            String token,
+            Function<Claims, T> claimResolver) {
+
+        Claims claims = extractAllClaims(token);
+
+        return claims != null
+                ? claimResolver.apply(claims)
+                : null;
     }
 
     public String extractUsername(String token) {
-        return extractClaims(token, Claims::getSubject);
+
+        return extractClaim(
+                token,
+                Claims::getSubject
+        );
     }
 
-    public boolean validateToken(String token, UserDetails userDetails) {
-        final String userName = extractUsername(token);
-        return (userName != null && userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public String extractProviderId(String token) {
+
+        return extractClaim(
+                token,
+                claims -> claims.get(
+                        "providerId",
+                        String.class
+                )
+        );
     }
 
-    private boolean isTokenExpired(String token){
-        Date exp = extractExpiration(token);
-        return exp != null && exp.before(new Date());
+    public boolean validateToken(
+            String token,
+            UserDetails userDetails) {
+
+        String username =
+                extractUsername(token);
+
+        return username != null
+                && username.equals(userDetails.getUsername())
+                && !isTokenExpired(token);
     }
 
-    private Date extractExpiration(String token){
-        return extractClaims(token, Claims::getExpiration);
+    private boolean isTokenExpired(String token) {
+
+        Date expiration =
+                extractExpiration(token);
+
+        return expiration != null
+                && expiration.before(new Date());
     }
 
-//    public String refreshToken(String token, UserDetails userDetails) {
-//        if (validateToken(token, userDetails)) {
-//            return generateToken(userDetails);
-//        }
-//        throw new IllegalArgumentException("Invalid or expired token");
-//    }
+    private Date extractExpiration(String token) {
+
+        return extractClaim(
+                token,
+                Claims::getExpiration
+        );
+    }
 }

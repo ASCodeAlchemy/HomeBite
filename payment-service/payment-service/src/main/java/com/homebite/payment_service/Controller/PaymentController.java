@@ -2,6 +2,7 @@ package com.homebite.payment_service.Controller;
 
 import com.homebite.payment_service.DTOs.RequestDTO.PaymentVerificationDTO;
 import com.homebite.payment_service.DTOs.RequestDTO.PaymentsDTO;
+import com.homebite.payment_service.DTOs.RequestDTO.SubscriptionPaymentRequest;
 import com.homebite.payment_service.DTOs.ResponseDTO.PaymentResponseDTO;
 import com.homebite.payment_service.Services.PaymentService;
 import jakarta.validation.Valid;
@@ -22,6 +23,14 @@ public class PaymentController {
     public PaymentController(PaymentService paymentService, @Value("${gateway.internal-secret}") String gatewaySecret) {
         this.paymentService = paymentService;
         this.gatewaySecret = gatewaySecret;
+    }
+
+    @PostMapping("/subscriptions")
+    public ResponseEntity<PaymentResponseDTO> createSubscriptionPayment(@RequestHeader("X-User-Email") String userEmail,
+                                                                        @RequestHeader("X-Gateway-Secret") String requestSecret,
+                                                                        @Valid @RequestBody SubscriptionPaymentRequest request) {
+        requireGateway(requestSecret);
+        return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.createSubscriptionPayment(request, userEmail));
     }
 
     @PostMapping

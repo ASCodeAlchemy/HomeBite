@@ -14,13 +14,14 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
-    public class JwtCookieToHeaderFilter extends AbstractGatewayFilterFactory<JwtCookieToHeaderFilter.Config> {
+public class JwtCookieToHeaderFilter
+        extends AbstractGatewayFilterFactory<JwtCookieToHeaderFilter.Config> {
+
     @Autowired
-     private JwtUtil jwtUtil;
+    private JwtUtil jwtUtil;
 
     @Value("${gateway.internal-secret}")
     private String gatewaySecret;
-
 
     public JwtCookieToHeaderFilter() {
         super(Config.class);
@@ -28,57 +29,121 @@ import reactor.core.publisher.Mono;
 
     @Override
     public GatewayFilter apply(Config config) {
+
         return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
-            String path = request.getURI().getPath();
 
+            ServerHttpRequest request =
+                    exchange.getRequest();
 
-            if (path.startsWith("/api/users/auth") ||
-                    path.equals("/api/users/register") ||
-                    path.equals("/api/users/verify-otp") ||
-                    path.equals("/api/users/verify-register-otp")||
-                    path.equals("/api/providers/register") ||
-                    path.equals("/api/providers/verify-register-otp")||
-                    path.equals("/api/providers/auth/login")||
-                    path.equals("/api/providers/verify-otp") ||
-                    path.equals("/api/drivers/register") ||
-                    path.equals("/api/drivers/verify-register-otp") ||
-                    path.equals("/api/drivers/auth/login") ||
-                    path.equals("/api/drivers/verify-otp")
-            ) {
+            String path =
+                    request.getURI().getPath();
+
+            // Public endpoints
+            if (path.startsWith("/api/users/auth")
+                    || path.equals("/api/users/register")
+                    || path.equals("/api/users/verify-otp")
+                    || path.equals("/api/users/verify-register-otp")
+                    || path.equals("/api/providers/register")
+                    || path.equals("/api/providers/verify-register-otp")
+                    || path.equals("/api/providers/auth/login")
+                    || path.equals("/api/providers/verify-otp")
+                    || path.equals("/api/drivers/register")
+                    || path.equals("/api/drivers/verify-register-otp")
+                    || path.equals("/api/drivers/auth/login")
+                    || path.equals("/api/drivers/verify-otp")) {
+
                 return chain.filter(exchange);
             }
 
-            HttpCookie jwtCookie = request.getCookies().getFirst("jwt");
+            // Get JWT from cookie
+            HttpCookie jwtCookie =
+                    request.getCookies()
+                            .getFirst("jwt");
+
             if (jwtCookie == null) {
+
                 return unauthorized(exchange);
             }
 
-            String token = jwtCookie.getValue();
+            String token =
+                    jwtCookie.getValue();
 
             try {
+
+
                 jwtUtil.validate(token);
 
-                String email = jwtUtil.extractEmail(token);
 
-                ServerHttpRequest mutatedRequest = request.mutate()
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                        .header("X-User-Email", email)
-                        .header("X-Gateway-Secret", gatewaySecret)
-                        .build();
+                String email =
+                        jwtUtil.extractEmail(token);
 
-                return chain.filter(exchange.mutate().request(mutatedRequest).build());
+                String providerId =
+                        jwtUtil.extractProviderId(token);
+
+
+
+                boolean isProviderRoute =
+                        path.startsWith("/api/providers/");
+
+                boolean requiresProviderClaim =
+                        isProviderRoute
+                                && !path.equals("/api/providers/me");
+
+                if (requiresProviderClaim
+                        && (providerId == null
+                        || providerId.isBlank())) {
+
+                    return unauthorized(exchange);
+                }
+
+                // Add trusted headers
+                ServerHttpRequest mutatedRequest =
+                        request.mutate()
+                                .header(
+                                        HttpHeaders.AUTHORIZATION,
+                                        "Bearer " + token
+                                )
+                                .header(
+                                        "X-User-Email",
+                                        email
+                                )
+                                .header(
+                                        "X-Provider-Id",
+                                        providerId
+                                )
+                                .header(
+                                        "X-Gateway-Secret",
+                                        gatewaySecret
+                                )
+                                .build();
+
+                return chain.filter(
+                        exchange.mutate()
+                                .request(mutatedRequest)
+                                .build()
+                );
+
             } catch (Exception e) {
+
+                e.printStackTrace();
+
                 return unauthorized(exchange);
             }
         };
     }
 
-    private Mono<Void> unauthorized(ServerWebExchange exchange) {
-        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-        return exchange.getResponse().setComplete();
+    private Mono<Void> unauthorized(
+            ServerWebExchange exchange) {
+
+        exchange.getResponse()
+                .setStatusCode(
+                        HttpStatus.UNAUTHORIZED
+                );
+
+        return exchange.getResponse()
+                .setComplete();
     }
 
-    public static class Config {}
+    public static class Config {
+    }
 }
-

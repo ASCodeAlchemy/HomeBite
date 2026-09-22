@@ -1,5 +1,6 @@
 package com.homebite.order_service.Controllers;
 
+import com.homebite.order_service.DTOs.OrderDTO;
 import com.homebite.order_service.DTOs.OrderStatusUpdateRequest;
 import com.homebite.order_service.Entity.Order;
 import com.homebite.order_service.Services.OrderService;
@@ -25,12 +26,14 @@ public class OrderController {
     private final ProviderIdentityClient providerIdentityClient;
     private final String gatewaySecret;
 
+
     public OrderController(OrderService orderService,
                            ProviderIdentityClient providerIdentityClient,
                            @Value("${gateway.internal-secret}") String gatewaySecret) {
         this.orderService = orderService;
         this.providerIdentityClient = providerIdentityClient;
         this.gatewaySecret = gatewaySecret;
+
     }
 
     @PostMapping("/{tiffinId}")
@@ -50,6 +53,13 @@ public class OrderController {
                                    @RequestHeader("X-Gateway-Secret") String requestSecret) {
         requireGateway(requestSecret);
         return orderService.getOrdersForUser(userId);
+    }
+
+    @GetMapping("/recent")
+    public List<Order> getRecentOrders(@RequestHeader("X-User-Email") String userId,
+                                       @RequestHeader("X-Gateway-Secret") String requestSecret) {
+        requireGateway(requestSecret);
+        return orderService.getRecentOrdersForUser(userId);
     }
 
     @GetMapping("/{orderId}")
@@ -93,5 +103,18 @@ public class OrderController {
         if (!providerIdentityClient.getProviderId(userEmail).equals(providerId)) {
             throw new IllegalArgumentException("You cannot view another provider's orders");
         }
+    }
+
+    @GetMapping("/myOrders")
+    public ResponseEntity<List<OrderDTO>> findMyOrders(
+            @RequestHeader("X-Provider-Id")
+            String providerId) {
+
+        List<OrderDTO> orders =
+                orderService.findOrdersByProvider(
+                        providerId
+                );
+
+        return ResponseEntity.ok(orders);
     }
 }

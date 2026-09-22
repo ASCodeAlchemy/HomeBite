@@ -2,15 +2,14 @@ package com.homebite.payment_service.DTOs.ResponseDTO;
 
 import com.homebite.payment_service.Enum.PaymentMethod;
 import com.homebite.payment_service.Enum.PaymentStatus;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentResponseDTO {
@@ -25,6 +24,8 @@ public class PaymentResponseDTO {
     private PaymentStatus paymentStatus;
 
     private String razorpayOrderId;
+    private String razorpayPaymentLinkId;
+    private String paymentLink;
     private String razorpayPaymentId;
 
     private String transactionId;

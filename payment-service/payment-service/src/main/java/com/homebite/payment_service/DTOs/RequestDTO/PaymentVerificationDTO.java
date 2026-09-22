@@ -5,8 +5,10 @@ import lombok.Data;
 
 @Data
 public class PaymentVerificationDTO {
-    @NotBlank
     private String razorpayOrderId;
+    private String razorpayPaymentLinkId;
+    private String razorpayPaymentLinkReferenceId;
+    private String razorpayPaymentLinkStatus;
     @NotBlank
     private String razorpayPaymentId;
     @NotBlank

@@ -30,6 +30,10 @@ public class GatewayHeaderAuthFilter extends OncePerRequestFilter {
 
         String email = request.getHeader("X-User-Email");
 
+        System.out.println("Incoming headers -> X-User-Email: [" + request.getHeader("X-User-Email")
+                + "], X-Provider-Id: [" + request.getHeader("X-Provider-Id") + "]");
+
+
         if (email != null && !email.trim().isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);

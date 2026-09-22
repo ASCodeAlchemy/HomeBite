@@ -3,6 +3,7 @@ package com.homebite.payment_service.Entitiy;
 
 import com.homebite.payment_service.Enum.PaymentMethod;
 import com.homebite.payment_service.Enum.PaymentStatus;
+import com.homebite.payment_service.Enum.SettlementStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,8 +42,14 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
     private String razorpayOrderId;
+    private String razorpayPaymentLinkId;
+    @Column(length = 2048)
+    private String paymentLink;
     private String razorpayPaymentId;
     private String razorpaySignature;
+
+    @Enumerated(EnumType.STRING)
+    private SettlementStatus settlementStatus = SettlementStatus.PENDING;
 
     @Column(unique = true)
     private String transactionId;

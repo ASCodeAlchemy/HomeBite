@@ -22,12 +22,7 @@ public class MyUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Provider provider = providerRepo.findByEmail(username)
+        return providerRepo.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
-        return new org.springframework.security.core.userdetails.User(
-                provider.getEmail(),
-                "",
-                Collections.emptyList()
-        );
     }
 }

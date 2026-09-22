@@ -50,17 +50,20 @@ spring:
             - StripPrefix=1
 
 
-
-
-
-
+        - id: subscription-service
+          uri: http://localhost:8088
+          predicates:
+            - Path=/api/subscriptions/**
+          filters:
+            - JwtCookieToHeaderFilter
+            - StripPrefix=1
 
 
 
 
 
 jwt:
-  secret: jdWWfrI4snlyFi2AfNY0tVgjJgZkDqdD+EV3YauOqzP4xRXWRjXvONNyA8AEFNoKh6p3VsxBA1mGqDm2d/punQ==
+  secret: 1I5pSxrZT2KX4kOwW2OQKwwHhYVVBRQpkp0gjSaJh9Q/QUu4MvIwsLPSo6aOz4qm4ruKfe9rpArf5Ce+Utxdpg==
 
 
 eureka:

@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -29,6 +30,14 @@ public class Provider implements UserDetails {
     private String email;
     private String password;
     private String restAddress;
+
+    private String razorpayAccountId;
+    private String bankAccountNumber;
+    private String bankIfsc;
+    private String bankAccountHolderName;
+    private String panNumber;
+    private BigDecimal commissionPercentage = BigDecimal.ZERO;
+    private boolean payoutOnboarded = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

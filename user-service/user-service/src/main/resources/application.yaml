@@ -39,7 +39,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: homebiteind@gmail.com
-    password: kmzq uxrq awlm jxyo
+    password: sqsi sxqw jppn poyg
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
@@ -50,7 +50,7 @@ spring:
 
   security:
     EXPIRATION: 3600000
-    SECRET_KEY: jdWWfrI4snlyFi2AfNY0tVgjJgZkDqdD+EV3YauOqzP4xRXWRjXvONNyA8AEFNoKh6p3VsxBA1mGqDm2d/punQ==
+    SECRET_KEY: 1I5pSxrZT2KX4kOwW2OQKwwHhYVVBRQpkp0gjSaJh9Q/QUu4MvIwsLPSo6aOz4qm4ruKfe9rpArf5Ce+Utxdpg==
   data:
     redis:
       host: localhost

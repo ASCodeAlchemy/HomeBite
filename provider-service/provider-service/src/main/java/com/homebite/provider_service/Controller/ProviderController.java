@@ -2,8 +2,10 @@ package com.homebite.provider_service.Controller;
 
 import com.homebite.provider_service.Config.JWTService;
 import com.homebite.provider_service.Config.MyUserDetailService;
+import com.homebite.provider_service.DTOs.RequestDTO.OrderDTO;
 import com.homebite.provider_service.DTOs.RequestDTO.OtpDto;
 import com.homebite.provider_service.DTOs.RequestDTO.ProviderDTO;
+import com.homebite.provider_service.DTOs.RequestDTO.ProviderPayoutDetailsDTO;
 import com.homebite.provider_service.DTOs.ResponseDTO.ResponseDTO;
 import com.homebite.provider_service.Entity.Provider;
 import com.homebite.provider_service.Repositories.ProviderRepo;
@@ -11,6 +13,7 @@ import com.homebite.provider_service.Services.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -184,6 +188,32 @@ public class ProviderController {
 
         return ResponseEntity.ok(providerInfo);
     }
+
+
+    @GetMapping("/myOrders")
+    public ResponseEntity<List<OrderDTO>> getMyOrders() {
+
+        List<OrderDTO> orders =
+                providerService.getMyOrders();
+
+        return ResponseEntity.ok(orders);
+    }
+
+    @PostMapping("/payout-details")
+    public ResponseEntity<ResponseDTO> savePayoutDetails(@RequestHeader("X-User-Email") String email,
+                                                         @Valid @RequestBody ProviderPayoutDetailsDTO request) {
+        Provider provider = providerRepo.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Provider not found"));
+        provider.setBankAccountNumber(request.getBankAccountNumber());
+        provider.setBankIfsc(request.getBankIfsc());
+        provider.setBankAccountHolderName(request.getBankAccountHolderName());
+        provider.setPanNumber(request.getPanNumber());
+        provider.setPayoutOnboarded(false);
+        providerRepo.save(provider);
+        return ResponseEntity.ok(new ResponseDTO("Payout details saved. Razorpay Route onboarding is still required."));
+    }
+
+
 
 
 

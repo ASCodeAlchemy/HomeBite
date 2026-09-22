@@ -39,5 +39,15 @@ eureka:
 order-service:
   url: http://localhost:8083
 
+provider-service:
+  url: http://localhost:8085
+
 gateway:
   internal-secret: 7qWThFMxHS6gPtr56lda9GGWCQuyAxSALjNBvCK5Bn9/kB+n1Twz2bFCGPiAQAvoMgQ8b24PXIKMMUvuoQ4yow==
+
+
+payment:
+  callback-secret: I3rhWDaGCCVXoWSH80N9yr+dOwBRAqN+Wo55RUABZS+lgaE1D+3CPF52/Y/nFCePqB7YT9ewtukwNqpMXjEjuw==
+
+subscription-service:
+  url: http://localhost:8088

@@ -1,5 +1,6 @@
 package com.homebite.order_service.Services;
 
+import com.homebite.order_service.DTOs.OrderDTO;
 import com.homebite.order_service.DTOs.TiffinDetailsDTO;
 import com.homebite.order_service.Entity.Order;
 import com.homebite.order_service.Entity.OrderItem;
@@ -61,6 +62,9 @@ public class OrderService {
 
     public List<Order> getOrdersForUser(String userId) {
         return orderRepo.findByUserIdOrderByCreatedAtDesc(userId);
+    }
+    public List<Order> getRecentOrdersForUser(String userId) {
+        return orderRepo.findTop10ByUserIdOrderByCreatedAtDesc(userId);
     }
 
     public List<Order> getOrdersForProvider(String providerId) {
@@ -124,5 +128,23 @@ public class OrderService {
         event.put("providerId", order.getProviderId());
         event.put("status", order.getStatus().name());
         kafkaTemplate.send("order-events", order.getOrderId(), event);
+    }
+
+
+    public List<OrderDTO> findOrdersByProvider(
+            String providerId) {
+
+        List<Order> orders =
+                orderRepo
+                        .findByProviderId(providerId);
+
+        return orders.stream()
+                .map(order -> new OrderDTO(
+                        order.getOrderId(),
+                        order.getUserId(),
+                        order.getProviderId(),
+                        order.getTotalAmount()
+                ))
+                .toList();
     }
 }
